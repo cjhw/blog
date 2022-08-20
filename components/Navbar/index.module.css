@@ -1,0 +1,39 @@
+.navbar {
+  height: 60px;
+  background-color: #fff;
+  border-bottom: 1px solid #f1f1f1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.navbar .logoArea {
+  font-size: 30px;
+  font-weight: bolder;
+  margin-right: 60px;
+}
+
+.navbar .linkArea a {
+  font-size: 18px;
+  padding: 0 20px;
+  color: #515767;
+}
+
+.navbar .linkArea .active {
+  color: #1e80ff;
+}
+
+.navbar .operationArea {
+  margin-left: 150px;
+}
+
+.navbar .operationArea button {
+  margin-right: 20px;
+}
+/*# sourceMappingURL=index.module.css.map */

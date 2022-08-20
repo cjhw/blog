@@ -10,7 +10,12 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@types/md5": "^2.3.2",
     "antd": "^4.22.6",
+    "axios": "^0.27.2",
+    "date-fns": "^2.29.2",
+    "js-base64": "^3.7.2",
+    "md5": "^2.3.0",
     "mockjs": "^1.1.0",
     "next": "12.2.5",
     "react": "18.2.0",
