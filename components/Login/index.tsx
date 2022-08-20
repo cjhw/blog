@@ -10,14 +10,16 @@ interface Iprops {
 }
 
 const Login = (props: Iprops) => {
-  const { isShow = false } = props;
+  const { isShow = false, onClose } = props;
   const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
   const [form, setForm] = useState({
     phone: '',
     verify: '',
   });
 
-  const handleClose = () => {};
+  const handleClose = () => {
+    onClose && onClose();
+  };
 
   const handleGetVerifyCode = () => {
     if (!form?.phone) {
@@ -39,7 +41,21 @@ const Login = (props: Iprops) => {
     // setIsShowVerifyCode(true);
   };
 
-  const handleLogin = () => {};
+  const handleLogin = () => {
+    request
+      .post('/api/user/login', {
+        ...form,
+        identity_type: 'phone',
+      })
+      .then((res: any) => {
+        if (res?.code === 0) {
+          // 登录成功
+          onClose && onClose();
+        } else {
+          message.error(res?.msg || '未知错误');
+        }
+      });
+  };
 
   const handleOAuthGithub = () => {};
 
