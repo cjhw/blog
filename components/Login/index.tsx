@@ -61,7 +61,16 @@ const Login = (props: Iprops) => {
       });
   };
 
-  const handleOAuthGithub = () => {};
+  // client-id 77eead5355dbfbf0c7d1
+  // client-secret ba43befe75ee0e34830f4e343d8e799c135a7b82
+
+  const handleOAuthGithub = () => {
+    const githubClientid = '77eead5355dbfbf0c7d1';
+    const redirectUri = 'ba43befe75ee0e34830f4e343d8e799c135a7b82';
+    window.open(
+      `https://github.com/login/oauth/authorize?client_id=${githubClientid}&redirect_uri=${redirectUri}`
+    );
+  };
 
   const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e?.target;
