@@ -1,13 +1,21 @@
 import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button } from 'antd';
+import { Button, Avatar, Dropdown, Menu, MenuProps } from 'antd';
+import { LoginOutlined, HomeOutlined } from '@ant-design/icons';
+import { useStore } from 'store';
 import styles from './index.module.scss';
 import { navs } from './config';
 import Login from 'components/Login';
+import request from 'service/fetch';
+
 
 const NavBar: NextPage = () => {
+  const store = useStore();
+  const { userId, avatar } = store.user.userInfo;
+
   const { pathname } = useRouter();
   const [isShowLogin, setIsShowLogin] = useState(false);
 
@@ -21,9 +29,56 @@ const NavBar: NextPage = () => {
     setIsShowLogin(false);
   };
 
+  const handleLogout = () => {
+    request.post('/api/user/logout').then((res: any) => {
+      if (res?.code === 0) {
+        store.user.setUserInfo({});
+      }
+    });
+  };
+  const handleGotoPersonalPage = () => {};
+
+  const handleItem:MenuProps["onClick"]=(e)=> {
+    if(e.key==="1") {
+      handleGotoPersonalPage()
+    }else if(e.key==="2"){
+      handleLogout()
+    }
+  }
+
+  type MenuItem = Required<MenuProps>['items'][number];
+
+  function getItem(
+    label: React.ReactNode,
+    key: React.Key,
+    icon?: React.ReactNode,
+    
+  ): MenuItem {
+    return {
+      key,
+      icon,
+      label  
+    } as MenuItem;
+  }
+
+  const items = [
+   getItem("个人主页","1",<HomeOutlined/>),
+   getItem("退出登录","2",<LoginOutlined/>)
+  ];
+
+  const renderDropDownMenu = () => {
+    return (
+      <Menu items={items} onClick={handleItem}>
+      </Menu>
+    );
+  };
+
   return (
     <div className={styles.navbar}>
-      <section className={styles.logoArea}>BLOG</section>
+      <section className={styles.logoArea}>
+        <img src="/logo.svg" alt="" />
+        BLOG
+      </section>
       <section className={styles.linkArea}>
         {navs?.map((nav) => (
           <Link key={nav?.label} href={nav?.value}>
@@ -35,13 +90,21 @@ const NavBar: NextPage = () => {
       </section>
       <section className={styles.operationArea}>
         <Button onClick={handleGotoEditorPage}>写文章</Button>
-        <Button type="primary" onClick={handleLogin}>
-          登录
-        </Button>
+        {userId ? (
+          <>
+            <Dropdown overlay={renderDropDownMenu()} placement="bottomLeft">
+              <Avatar src={avatar} size={32} />
+            </Dropdown>
+          </>
+        ) : (
+          <Button type="primary" onClick={handleLogin}>
+            登录
+          </Button>
+        )}
       </section>
       <Login isShow={isShowLogin} onClose={handleClose} />
     </div>
   );
 };
 
-export default NavBar;
+export default observer(NavBar);

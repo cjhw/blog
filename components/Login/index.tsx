@@ -3,6 +3,8 @@ import { message } from 'antd';
 import { ChangeEvent, useState } from 'react';
 import styles from './index.module.scss';
 import request from 'service/fetch';
+import { useStore } from 'store';
+import { observer } from 'mobx-react-lite';
 
 interface Iprops {
   isShow: boolean;
@@ -10,6 +12,7 @@ interface Iprops {
 }
 
 const Login = (props: Iprops) => {
+  const store = useStore();
   const { isShow = false, onClose } = props;
   const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
   const [form, setForm] = useState({
@@ -50,6 +53,7 @@ const Login = (props: Iprops) => {
       .then((res: any) => {
         if (res?.code === 0) {
           // 登录成功
+          store.user.setUserInfo(res?.data);
           onClose && onClose();
         } else {
           message.error(res?.msg || '未知错误');
@@ -125,4 +129,4 @@ const Login = (props: Iprops) => {
   ) : null;
 };
 
-export default Login;
+export default observer(Login);
