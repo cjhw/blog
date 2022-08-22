@@ -1,7 +1,6 @@
-import { Connection } from 'mysql2';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User, UserAuth, Article } from './entity/index';
+import { User, UserAuth, Article, Comment } from './entity/index';
 
 const host = process.env.DATABASE_HOST;
 const port = Number(process.env.DATABASE_PORT);
@@ -16,7 +15,7 @@ const AppDataSource = new DataSource({
   username,
   password,
   database,
-  entities: [User, UserAuth, Article],
+  entities: [User, UserAuth, Article, Comment],
   synchronize: false,
   logging: true,
 });
