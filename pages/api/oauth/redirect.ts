@@ -48,9 +48,7 @@ async function redirect(req: NextApiRequest, res: NextApiResponse) {
       identity_type: 'github',
       identifier: githubClientID,
     },
-    relations: {
-      user: true,
-    },
+    relations: ["user"]
   });
 
   if (userAuth) {

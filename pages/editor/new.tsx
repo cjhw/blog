@@ -7,6 +7,7 @@ import { Input,Button, message } from 'antd';
 import request from 'service/fetch'
 import { useRouter } from 'next/router';
 import { useStore } from 'store';
+import { observer } from 'mobx-react-lite';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
@@ -57,4 +58,4 @@ const NewEditor = () => {
 
 (NewEditor as any).layout = null;
 
-export default NewEditor;
+export default observer(NewEditor);

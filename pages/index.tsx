@@ -10,9 +10,7 @@ interface IProps {
 export async function getServerSideProps() {
   const db = await getDataBaseConnection();
   const articles = await db.getRepository(Article).find({
-    relations: {
-      user: true,
-    },
+    relations: ['user'],
   });
 
   console.log(articles);
