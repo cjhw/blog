@@ -1,4 +1,5 @@
 import { IronSession } from 'iron-session';
+import { ITag } from 'pages/tag';
 import { IUserInfo } from 'store/userStore';
 
 export type ISession = IronSession & Record<string, any>;
@@ -19,4 +20,5 @@ export type IArticle = {
   update_time: Date,
   user: IUserInfo,
   comments: IComment[],
+  tags: ITag[],
 };

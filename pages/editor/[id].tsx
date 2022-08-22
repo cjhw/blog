@@ -16,17 +16,17 @@ interface IProps {
 }
 
 export async function getServerSideProps({ params }: any) {
+  
   const articleId = params?.id;
-
-  const db = await getDataBaseConnection()
+  const db = await getDataBaseConnection();
   const articleRepo = db.getRepository(Article);
   const article = await articleRepo.findOne({
     where: {
       id: articleId,
     },
-    relations: ['user'],
+    relations: ['user','tags'],
   });
-
+  
   return {
     props: {
       article: JSON.parse(JSON.stringify(article)),
@@ -37,11 +37,13 @@ export async function getServerSideProps({ params }: any) {
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 const ModifyEditor = ({ article }: IProps) => {
+
   const { push, query } = useRouter();
   const articleId = Number(query?.id)
+  const followTagsIds = article?.tags.map(tag=>tag.id)
   const [title, setTitle] = useState(article?.title || '');
   const [content, setContent] = useState(article?.content || '');
-  const [tagIds, setTagIds] = useState([]);
+  const [tagIds, setTagIds] = useState(followTagsIds);
   const [allTags, setAllTags] = useState([]);
 
   useEffect(() => {
@@ -82,7 +84,12 @@ const ModifyEditor = ({ article }: IProps) => {
 
   const handleSelectTag = (value: []) => {
     setTagIds(value);
+    console.log(tagIds);
+    
   }
+
+
+  
 
   return (
     <div className={styles.container}>
@@ -98,6 +105,7 @@ const ModifyEditor = ({ article }: IProps) => {
           mode="multiple"
           allowClear
           placeholder="请选择标签"
+          defaultValue={followTagsIds as any}
           onChange={handleSelectTag}
         >{allTags?.map((tag: any) => (
           <Select.Option key={tag?.id} value={tag?.id}>{tag?.title}</Select.Option>

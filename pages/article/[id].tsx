@@ -49,8 +49,6 @@ const ArticleDetail = (props: IProps) => {
   const [inputVal, setInputVal] = useState('');
   const [comments, setComments] = useState(article?.comments || []);
 
-  console.log(article);
-
   const handleComment = () => {
     request
       .post('/api/comment/publish', {
