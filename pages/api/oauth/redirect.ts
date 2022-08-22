@@ -5,7 +5,7 @@ import { ironOptions } from 'config/index';
 import { ISession } from 'pages/api/index';
 import request from 'service/fetch';
 import { setCookie } from 'utils/index';
-import { AppDataSource } from 'db/index';
+import { getDataBaseConnection } from 'db/index';
 import { User, UserAuth } from 'db/entity/index';
 import { userAgent } from 'next/server';
 
@@ -42,7 +42,7 @@ async function redirect(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const cookies = Cookie.fromApiRoute(req, res);
-  const db = await AppDataSource.initialize();
+  const db = await getDataBaseConnection()
   const userAuth = await db.getRepository(UserAuth).findOne({
     where: {
       identity_type: 'github',

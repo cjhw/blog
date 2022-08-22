@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button, Avatar, Dropdown, Menu, MenuProps } from 'antd';
+import { Button, Avatar, Dropdown, Menu, MenuProps, message } from 'antd';
 import { LoginOutlined, HomeOutlined } from '@ant-design/icons';
 import { useStore } from 'store';
 import styles from './index.module.scss';
@@ -16,10 +16,16 @@ const NavBar: NextPage = () => {
   const store = useStore();
   const { userId, avatar } = store.user.userInfo;
 
-  const { pathname } = useRouter();
+  const {push, pathname } = useRouter();
   const [isShowLogin, setIsShowLogin] = useState(false);
 
-  const handleGotoEditorPage = () => {};
+  const handleGotoEditorPage = () => {
+    if (userId) {
+      push('/editor/new');
+    } else {
+      message.warning('请先登录');
+    }
+  };
 
   const handleLogin = () => {
     setIsShowLogin(true);
@@ -36,7 +42,9 @@ const NavBar: NextPage = () => {
       }
     });
   };
-  const handleGotoPersonalPage = () => {};
+  const handleGotoPersonalPage = () => {
+    push(`/user/${userId}`);
+  };
 
   const handleItem:MenuProps["onClick"]=(e)=> {
     if(e.key==="1") {

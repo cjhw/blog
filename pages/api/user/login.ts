@@ -4,7 +4,7 @@ import { Cookie } from 'next-cookie';
 import { ironOptions } from 'config';
 import { ISession } from 'pages/api/index';
 import { setCookie } from 'utils';
-import { AppDataSource } from 'db';
+import { getDataBaseConnection } from 'db';
 import { User, UserAuth } from 'db/entity';
 
 export default withIronSessionApiRoute(login, ironOptions);
@@ -13,7 +13,7 @@ async function login(req: NextApiRequest, res: NextApiResponse) {
   const session: ISession = req.session;
   const cookies = Cookie.fromApiRoute(req, res);
   const { phone = '', verify = '', identity_type = 'phone' } = req.body;
-  const db = await AppDataSource.initialize();
+  const db = await getDataBaseConnection();
   const userAuthRepo = db.getRepository(UserAuth);
 
   if (String(session.verifyCode) === String(verify)) {

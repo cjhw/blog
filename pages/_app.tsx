@@ -11,12 +11,20 @@ interface IProps {
 }
 
 function MyApp({ initialValue, Component, pageProps }: IProps) {
+  const renderLayout = () => {
+    if ((Component as any).layout === null) {
+      return <Component {...pageProps}></Component>;
+    } else {
+      return (
+        <Layout>
+          <Component {...pageProps}></Component>
+        </Layout>
+      );
+    }
+  };
+
   return (
-    <StoreProvider initialValue={initialValue}>
-      <Layout>
-        <Component {...pageProps}></Component>
-      </Layout>
-    </StoreProvider>
+    <StoreProvider initialValue={initialValue}>{renderLayout()}</StoreProvider>
   );
 }
 

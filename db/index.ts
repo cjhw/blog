@@ -1,6 +1,7 @@
+import { Connection } from 'mysql2';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User, UserAuth } from './entity/index';
+import { User, UserAuth, Article } from './entity/index';
 
 const host = process.env.DATABASE_HOST;
 const port = Number(process.env.DATABASE_PORT);
@@ -8,14 +9,42 @@ const username = process.env.DATABASE_USERNAME;
 const password = process.env.DATABASE_PASSWORD;
 const database = process.env.DATABASE_NAME;
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: 'mysql',
   host,
   port,
   username,
   password,
   database,
-  entities: [User, UserAuth],
+  entities: [User, UserAuth, Article],
   synchronize: false,
   logging: true,
 });
+
+let connection: DataSource;
+
+export const create = async () => {
+  connection = await AppDataSource.initialize();
+  return connection;
+};
+
+export const get = () => {
+  return connection;
+};
+
+export const has = () => {
+  return connection !== null;
+};
+
+export const getDataBaseConnection = () => {
+  if (!has()) {
+    return create();
+  } else {
+    const current = get();
+    if (get()?.isInitialized) {
+      return current;
+    } else {
+      return create();
+    }
+  }
+};
