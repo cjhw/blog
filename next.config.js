@@ -6,6 +6,11 @@ const nextConfig = {
     domains: ['img1.mukewang.com'],
   },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  experimental: {
+    images: {
+      allowFutureImage: true,
+    },
+  },
 };
 
 const withMDX = require('@next/mdx')({
