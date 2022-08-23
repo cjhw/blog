@@ -5,7 +5,7 @@ const nextConfig = {
   images: {
     domains: ['img1.mukewang.com'],
   },
-  swcMinify: true,
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
     images: {
       allowFutureImage: true,
@@ -13,5 +13,14 @@ const nextConfig = {
   },
 };
 
+const withMDX = require('@next/mdx')({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
 const removeImports = require('next-remove-imports')();
-module.exports = removeImports(nextConfig);
+
+module.exports = removeImports(withMDX(nextConfig));
