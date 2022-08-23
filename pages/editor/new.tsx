@@ -1,105 +1,89 @@
-import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { observer } from 'mobx-react-lite';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { Input, Button, message, Select } from 'antd';
-import { useRouter } from 'next/router';
-import { useStore } from 'store/index';
+import { Divider } from 'antd';
+import classnames from 'classnames';
+import { getDataBaseConnection } from 'db/index';
+import { Article, Tag } from 'db/entity';
+// import ListItem from 'components/ListItem';
+import { IArticle } from 'pages/api/index';
 import request from 'service/fetch';
 import styles from './index.module.scss';
 
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+const DynamicComponent = dynamic(() => import('components/ListItem'));
 
-const NewEditor = () => {
-  const store = useStore();
-  const { push } = useRouter();
-  const { userId } = store.user.userInfo;
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [tagIds, setTagIds] = useState([]);
-  const [allTags, setAllTags] = useState([]);
+interface ITag {
+  id: number;
+  title: string;
+}
+
+interface IProps {
+  articles: IArticle[];
+  tags: ITag[];
+}
+
+export async function getServerSideProps() {
+  const db = await getDataBaseConnection();
+  const articles = await db.getRepository(Article).find({
+    relations: ['user', 'tags'],
+  });
+  const tags = await db.getRepository(Tag).find({
+    relations: ['users'],
+  });
+
+  return {
+    props: {
+      articles: JSON.parse(JSON.stringify(articles)) || [],
+      tags: JSON.parse(JSON.stringify(tags)) || [],
+    },
+  };
+}
+
+const Home = (props: IProps) => {
+  const { articles, tags } = props;
+  const [selectTag, setSelectTag] = useState(0);
+  const [showAricles, setShowAricles] = useState([...articles]);
+
+  const handleSelectTag = (event: any) => {
+    const { tagid } = event?.target?.dataset || {};
+    setSelectTag(Number(tagid));
+  };
 
   useEffect(() => {
-    request.get('/api/tag/get').then((res: any) => {
-      if (res?.code === 0) {
-        setAllTags(res?.data?.allTags || []);
-      }
-    });
-  }, []);
-
-  const handlePublish = () => {
-    if (!title) {
-      message.warning('请输入文章标题');
-      return;
-    }
-    request
-      .post('/api/article/publish', {
-        title,
-        content,
-        tagIds
-      })
-      .then((res: any) => {
+    selectTag &&
+      request.get(`/api/article/get?tag_id=${selectTag}`).then((res: any) => {
         if (res?.code === 0) {
-          userId ? push(`/user/${userId}`) : push('/');
-          message.success('发布成功');
-        } else {
-          message.error(res?.msg || '发布失败');
+          setShowAricles(res?.data);
         }
       });
-  };
-
-  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTitle(event?.target?.value);
-  };
-
-  const handleContentChange = (content: any) => {
-    setContent(content);
-  };
-
-  const handleSelectTag = (value: []) => {
-    setTagIds(value);
-  };
+  }, [selectTag]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.operation}>
-        <Input
-          className={styles.title}
-          placeholder="请输入文章标题"
-          value={title}
-          onChange={handleTitleChange}
-        ></Input>
-        <Select
-          className={styles.tag}
-          mode="multiple"
-          allowClear
-          placeholder="请选择标签"
-          onChange={handleSelectTag}
-        >
-          {allTags?.map((tag: any) => (
-            <Select.Option key={tag?.id} value={tag?.id}>
-              {tag?.title}
-            </Select.Option>
-          ))}
-        </Select>
-        <Button
-          className={styles.button}
-          type="primary"
-          onClick={handlePublish}
-        >
-          发布
-        </Button>
+    <div>
+      <div className={styles.tags} onClick={handleSelectTag}>
+        {tags?.map((tag) => (
+          <div
+            key={tag?.id}
+            data-tagid={tag?.id}
+            className={classnames(
+              styles.tag,
+              selectTag === tag?.id ? styles['active'] : ''
+            )}
+          >
+            {tag?.title}
+          </div>
+        ))}
       </div>
-      <MDEditor
-        value={content}
-        height={1080}
-        onChange={handleContentChange}
-      ></MDEditor>
+      <div className="content-layout">
+        {showAricles?.map((article: any) => (
+          <>
+            {/* <ListItem article={article} /> */}
+            <DynamicComponent article={article} />
+            <Divider />
+          </>
+        ))}
+      </div>
     </div>
   );
 };
 
-(NewEditor as any).layout = null;
-
-export default observer(NewEditor);
+export default Home;

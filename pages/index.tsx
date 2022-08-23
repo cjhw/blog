@@ -1,34 +1,86 @@
-import { getDataBaseConnection } from 'db';
-import { Article } from 'db/entity';
-import { IArticle } from './api';
-import ListItem from 'components/ListItem';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { Divider } from 'antd';
+import classnames from 'classnames';
+import { getDataBaseConnection } from 'db/index';
+import { Article, Tag } from 'db/entity';
+// import ListItem from 'components/ListItem';
+import { IArticle } from 'pages/api/index';
+import request from 'service/fetch';
+import styles from './index.module.scss';
+
+const DynamicComponent = dynamic(() => import('components/ListItem'));
+
+interface ITag {
+  id: number;
+  title: string;
+}
 
 interface IProps {
   articles: IArticle[];
+  tags: ITag[];
 }
 
 export async function getServerSideProps() {
   const db = await getDataBaseConnection();
   const articles = await db.getRepository(Article).find({
-    relations: ['user'],
+    relations: ['user', 'tags'],
   });
-
-  console.log(articles);
+  const tags = await db.getRepository(Tag).find({
+    relations: ['users'],
+  });
 
   return {
     props: {
       articles: JSON.parse(JSON.stringify(articles)) || [],
+      tags: JSON.parse(JSON.stringify(tags)) || [],
     },
   };
 }
 
 const Home = (props: IProps) => {
-  const { articles } = props;
+  const { articles, tags } = props;
+  const [selectTag, setSelectTag] = useState(0);
+  const [showAricles, setShowAricles] = useState([...articles]);
+
+  const handleSelectTag = (event: any) => {
+    const { tagid } = event?.target?.dataset || {};
+    setSelectTag(Number(tagid));
+  };
+
+  useEffect(() => {
+    selectTag &&
+      request.get(`/api/article/get?tag_id=${selectTag}`).then((res: any) => {
+        if (res?.code === 0) {
+          setShowAricles(res?.data);
+        }
+      });
+  }, [selectTag]);
+
   return (
     <div>
-      {articles.map((article) => (
-        <ListItem key={article.id} article={article} />
-      ))}
+      <div className={styles.tags} onClick={handleSelectTag}>
+        {tags?.map((tag) => (
+          <div
+            key={tag?.id}
+            data-tagid={tag?.id}
+            className={classnames(
+              styles.tag,
+              selectTag === tag?.id ? styles['active'] : ''
+            )}
+          >
+            {tag?.title}
+          </div>
+        ))}
+      </div>
+      <div className="content-layout">
+        {showAricles?.map((article) => (
+          <div key={article?.id}>
+            <DynamicComponent article={article} />
+            <Divider />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
