@@ -12,45 +12,20 @@ import { getDataBaseConnection } from 'db/index';
 import { User, Article } from 'db/entity';
 import styles from './index.module.scss';
 
-export async function getStaticPaths() {
-  // user/[id]
-  const db = await getDataBaseConnection();
-  const users = await db.getRepository(User).find();
-  const userIds = users?.map((user) => ({ params: { id: String(user?.id) } }));
+// export async function getStaticPaths() {
+//   // user/[id]
+//   const db = await getDataBaseConnection();
+//   const users = await db.getRepository(User).find();
+//   const userIds = users?.map((user) => ({ params: { id: String(user?.id) } }));
 
-  // [{params: 1}, {params: 2}, {params: 3}]
-  return {
-    paths: userIds,
-    fallback: 'blocking',
-  };
-}
+//   // [{params: 1}, {params: 2}, {params: 3}]
+//   return {
+//     paths: userIds,
+//     fallback: 'blocking',
+//   };
+// }
 
-export async function getStaticProps({ params }: { params: any }) {
-  const userId = params?.id;
-  const db = await getDataBaseConnection();
-  const user = await db.getRepository(User).findOne({
-    where: {
-      id: Number(userId),
-    },
-  });
-  const articles = await db.getRepository(Article).find({
-    where: {
-      user: {
-        id: Number(userId),
-      },
-    },
-    relations: ['user', 'tags'],
-  });
-
-  return {
-    props: {
-      userInfo: JSON.parse(JSON.stringify(user)),
-      articles: JSON.parse(JSON.stringify(articles)),
-    },
-  };
-}
-
-// export async function getServerSideProps({ params }: { params: any }) {
+// export async function getStaticProps({ params }: { params: any }) {
 //   const userId = params?.id;
 //   const db = await getDataBaseConnection();
 //   const user = await db.getRepository(User).findOne({
@@ -58,7 +33,6 @@ export async function getStaticProps({ params }: { params: any }) {
 //       id: Number(userId),
 //     },
 //   });
-
 //   const articles = await db.getRepository(Article).find({
 //     where: {
 //       user: {
@@ -75,6 +49,32 @@ export async function getStaticProps({ params }: { params: any }) {
 //     },
 //   };
 // }
+
+export async function getServerSideProps({ params }: { params: any }) {
+  const userId = params?.id;
+  const db = await getDataBaseConnection();
+  const user = await db.getRepository(User).findOne({
+    where: {
+      id: Number(userId),
+    },
+  });
+
+  const articles = await db.getRepository(Article).find({
+    where: {
+      user: {
+        id: Number(userId),
+      },
+    },
+    relations: ['user', 'tags'],
+  });
+
+  return {
+    props: {
+      userInfo: JSON.parse(JSON.stringify(user)),
+      articles: JSON.parse(JSON.stringify(articles)),
+    },
+  };
+}
 
 const UserDetail = (props: any) => {
   const { userInfo = {}, articles = [] } = props;
