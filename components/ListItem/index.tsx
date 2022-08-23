@@ -15,7 +15,6 @@ const ListItem = (props: IProps) => {
   const { user } = article;
 
   return (
-    // eslint-disable-next-line @next/next/link-passhref
     <Link href={`/article/${article.id}`}>
       <div className={styles.container}>
         <div className={styles.article}>

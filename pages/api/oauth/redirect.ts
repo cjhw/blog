@@ -7,7 +7,7 @@ import request from 'service/fetch';
 import { setCookie } from 'utils/index';
 import { getDataBaseConnection } from 'db/index';
 import { User, UserAuth } from 'db/entity/index';
-import { userAgent } from 'next/server';
+
 
 export default withIronSessionApiRoute(redirect, ironOptions);
 

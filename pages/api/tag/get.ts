@@ -4,7 +4,6 @@ import { ironOptions } from 'config/index';
 import { ISession } from 'pages/api/index';
 import { getDataBaseConnection } from 'db/index';
 import { Tag } from 'db/entity/index';
-import { FindOptionsWhere } from 'typeorm';
 
 export default withIronSessionApiRoute(get, ironOptions);
 

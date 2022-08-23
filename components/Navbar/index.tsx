@@ -1,7 +1,9 @@
+import React from 'react';
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import Image from 'next/future/image';
 import { useRouter } from 'next/router';
 import { Button, Avatar, Dropdown, Menu, MenuProps, message } from 'antd';
 import { LoginOutlined, HomeOutlined } from '@ant-design/icons';
@@ -84,7 +86,7 @@ const NavBar: NextPage = () => {
   return (
     <div className={styles.navbar}>
       <section className={styles.logoArea}>
-        <img src="/logo.svg" alt="" />
+        <Image src="/logo.svg" width={50} height={55}  />
         BLOG
       </section>
       <section className={styles.linkArea}>

@@ -6,6 +6,11 @@ const nextConfig = {
     domains: ['img1.mukewang.com'],
   },
   swcMinify: true,
+  experimental: {
+    images: {
+      allowFutureImage: true,
+    },
+  },
 };
 
 const removeImports = require('next-remove-imports')();
