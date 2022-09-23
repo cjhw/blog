@@ -10,6 +10,8 @@ export default withIronSessionApiRoute(publish, ironOptions);
 
 async function publish(req: NextApiRequest, res: NextApiResponse) {
   const session: ISession = req.session;
+  console.log(session);
+  
   const { title = '', content = '', tagIds = [] } = req.body;
   const db = await getDataBaseConnection();
   const userRepo = db.getRepository(User);
